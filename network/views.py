@@ -1,7 +1,6 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import extend_schema
 from rest_framework import filters, viewsets
-
 from .models import NetworkNode, Product
 from .permissions import IsActiveStaff
 from .serializers import NetworkNodeSerializer, ProductSerializer
@@ -20,7 +19,7 @@ class NetworkNodeViewSet(viewsets.ModelViewSet):
         filters.SearchFilter,
         filters.OrderingFilter,
     ]
-    filterset_fields = ["country"]
+    filterset_fields = ["country", "role", "supplier"]
     search_fields = ["name"]
     ordering_fields = ["created_at", "debt"]
     ordering = ["-created_at"]

@@ -1,5 +1,5 @@
 from django.contrib import admin
-
+from django.utils.html import format_html
 from network.models import NetworkNode, Product
 
 
@@ -10,13 +10,15 @@ class NetworkNodeAdmin(admin.ModelAdmin):
 
     Возможности:
         - Отображение ключевых полей в списке объектов
-        - Фильтрация по названию города
+        - Фильтрация по названию города, стране, поставщику
+        - Поиск по названию, email, городу, стране
         - Отображение поставщика в виде кликабельной ссылки
         - Действие администратора: обнуление задолженности перед поставщиком
     """
 
     list_display = (
         "name",
+        "role",
         "city",
         "country",
         "email",
@@ -24,31 +26,27 @@ class NetworkNodeAdmin(admin.ModelAdmin):
         "debt",
         "created_at",
     )
-    list_filter = ("city", "country", "supplier")
+    list_filter = ("city", "country", "role", "supplier")
     search_fields = ("name", "email", "city", "country")
     actions = ["clear_debt"]
 
+    @admin.display(description="Поставщик", ordering="supplier__name")
     def supplier_link(self, obj):
         """
         Возвращает HTML-ссылку на карточку поставщика, если он указан.
         """
         if obj.supplier:
-            return f'<a href="/admin/network/networknode/{obj.supplier.id}/change/">{obj.supplier.name}</a>'
+            return format_html(
+                '<a href="/admin/network/networknode/{}/change/">{}</a>',
+                obj.supplier.id,
+                obj.supplier.name,
+            )
         return "-"
 
-    supplier_link.allow_tags = True
-    supplier_link.short_description = "Поставщик"
-
+    @admin.action(description="Очистить задолженность перед поставщиком")
     def clear_debt(self, request, queryset):
         updated = queryset.update(debt=0.00)
         self.message_user(request, f"Задолженность обнулена у {updated} узлов.")
-
-    clear_debt.short_description = "Очистить задолженность перед поставщиком"
-
-    def get_actions(self, request):
-        actions = super().get_actions(request)
-        print("Доступные действия:", actions.keys())
-        return actions
 
 
 @admin.register(Product)

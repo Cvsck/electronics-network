@@ -1,5 +1,4 @@
 from django.db import models
-from django.utils import timezone
 
 
 class NetworkNode(models.Model):
@@ -14,17 +13,25 @@ class NetworkNode(models.Model):
         ("KZ", "Казахстан"),
         ("GE", "Грузия"),
         ("AM", "Армения"),
-        # добавь любые другие
+        # можно добавить другие страны
     ]
-    name = models.CharField("Название", max_length=255)
-    email = models.EmailField("Email")
+
+    ROLE_CHOICES = [
+        ("factory", "Завод"),
+        ("retail", "Розничная сеть"),
+        ("individual", "Индивидуальный предприниматель"),
+    ]
+
+    name = models.CharField("Название", max_length=255, unique=True)  # Уникальное название
+    email = models.EmailField("Email", unique=True)  # Уникальный email
     country = models.CharField("Страна", max_length=2, choices=COUNTRY_CHOICES)
+    role = models.CharField("Тип узла", max_length=20, choices=ROLE_CHOICES, default="retail")
     city = models.CharField("Город", max_length=100)
     street = models.CharField("Улица", max_length=100)
     house_number = models.CharField("Номер дома", max_length=20)
     supplier = models.ForeignKey(
         "self",
-        verbose_name="Поставщик",
+        verbose_name="Поставщик (предыдущий по иерархии объект сети)",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
@@ -39,19 +46,24 @@ class NetworkNode(models.Model):
     def __str__(self):
         return self.name
 
+    def get_level(self) -> int:
+        """
+        Вычисляет уровень узла в иерархии:
+        - 0: если нет поставщика (завод)
+        - 1: если поставщик — завод
+        - 2: если поставщик — магазин и т.д.
+        """
+        level = 0
+        current = self
+        while current.supplier:
+            level += 1
+            current = current.supplier
+        return level
+
 
 class Product(models.Model):
     """
     Представляет товар, связанный с конкретным узлом сети.
-
-    Поля:
-        - name: название продукта
-        - model: модель
-        - release_date: дата выхода на рынок
-        - price: цена с точностью до копеек
-        - available: доступность
-        - network_node: узел сети, к которому привязан товар
-        - created_at: время создания (устанавливается автоматически)
     """
 
     name = models.CharField("Название продукта", max_length=255)
@@ -65,9 +77,7 @@ class Product(models.Model):
         on_delete=models.CASCADE,
         related_name="products",
     )
-    created_at = models.DateTimeField(
-        "Время создания", auto_now_add=True
-    )  # ✅ только auto_now_add
+    created_at = models.DateTimeField("Время создания", auto_now_add=True)
 
     class Meta:
         verbose_name = "Продукт"
