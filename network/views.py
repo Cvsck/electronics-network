@@ -1,6 +1,7 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import extend_schema
 from rest_framework import filters, viewsets
+
 from .models import NetworkNode, Product
 from .permissions import IsActiveStaff
 from .serializers import NetworkNodeSerializer, ProductSerializer

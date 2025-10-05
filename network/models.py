@@ -22,10 +22,14 @@ class NetworkNode(models.Model):
         ("individual", "Индивидуальный предприниматель"),
     ]
 
-    name = models.CharField("Название", max_length=255, unique=True)  # Уникальное название
+    name = models.CharField(
+        "Название", max_length=255, unique=True
+    )  # Уникальное название
     email = models.EmailField("Email", unique=True)  # Уникальный email
     country = models.CharField("Страна", max_length=2, choices=COUNTRY_CHOICES)
-    role = models.CharField("Тип узла", max_length=20, choices=ROLE_CHOICES, default="retail")
+    role = models.CharField(
+        "Тип узла", max_length=20, choices=ROLE_CHOICES, default="retail"
+    )
     city = models.CharField("Город", max_length=100)
     street = models.CharField("Улица", max_length=100)
     house_number = models.CharField("Номер дома", max_length=20)
