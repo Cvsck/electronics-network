@@ -1,0 +1,26 @@
+[tool.poetry]
+name = "electronics-network"
+version = "0.1.0"
+description = ""
+authors = ["Pestov Maksim"]
+readme = "README.md"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = ">=3.13"
+django = ">=5.2.7,<6.0.0"
+djangorestframework = ">=3.16.1,<4.0.0"
+psycopg2-binary = ">=2.9.10,<3.0.0"
+django-filter = ">=25.1,<26.0"
+drf-spectacular = "^0.28.0"
+python-dotenv = "^1.1.1"
+
+[tool.poetry.group.dev.dependencies]
+black = "^25.9.0"
+flake8 = "^7.3.0"
+isort = "^6.1.0"
+pre-commit = "^4.3.0"
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
