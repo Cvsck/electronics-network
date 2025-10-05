@@ -1,4 +1,5 @@
 from rest_framework import serializers
+
 from .models import NetworkNode, Product
 
 
@@ -7,6 +8,7 @@ class SupplierSerializer(serializers.ModelSerializer):
     Вложенный сериализатор для отображения поставщика узла сети.
     Отображает только имя и город поставщика.
     """
+
     class Meta:
         model = NetworkNode
         fields = ("id", "name", "city")
@@ -64,9 +66,7 @@ class ProductSerializer(serializers.ModelSerializer):
 
     network_node = NetworkNodeSerializer(read_only=True)
     network_node_id = serializers.PrimaryKeyRelatedField(
-        queryset=NetworkNode.objects.all(),
-        source="network_node",
-        write_only=True
+        queryset=NetworkNode.objects.all(), source="network_node", write_only=True
     )
 
     class Meta:
